@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Eventos Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body
+    class="min-h-screen pt-20 text-gray-800 max-w-6xl mx-auto px-6 bg-white"
+  >
+    <div
+      class="flex flex-col md:flex-row justify-between items-center mb-6 px-4 py-3 bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-lg shadow-lg text-gray-300"
+    >
+      <p class="font-semibold text-lg mb-3 md:mb-0">
+        Bienvenido, <%=usuario.rol%> <%= usuario ? usuario.nombre + " " + usuario.apellidos :
+        "Invitado" %>
+      </p>
+      <form action="/logout" method="GET" class="w-full md:w-auto">
+        <button
+          type="submit"
+          class="w-full md:w-auto bg-teal-700 hover:bg-teal-800 text-white font-semibold px-5 py-2 rounded-lg transition"
+        >
+          Cerrar sesión
+        </button>
+      </form>
+    </div>
+
+    <h1 class="text-3xl font-extrabold text-teal-400 mb-6 px-4 md:px-0">
+      Eventos publicados por alumnos
+    </h1>
+
+    <button
+      id="btnVerAlumnos"
+      class="mb-6 mx-4 md:mx-0 bg-teal-700 hover:bg-teal-800 text-white font-semibold px-5 py-2 rounded-lg w-full md:w-auto transition"
+    >
+      Ver Alumnos
+    </button>
+
+    <div
+      id="listaAlumnos"
+      class="hidden border border-teal-600 p-4 rounded-lg max-h-64 overflow-y-auto mb-8 mx-4 md:mx-0 bg-gradient-to-b from-gray-800 to-gray-900 shadow-lg text-gray-300"
+    >
+      <ul>
+        <% alumnos.forEach(alumno => { %>
+        <li>
+          <button
+            class="text-left w-full px-3 py-2 mb-1 rounded-lg hover:bg-teal-600 transition font-medium focus:outline-none focus:ring-2 focus:ring-teal-400 alumno-btn"
+            data-id="<%= alumno.id %>"
+            data-nombre="<%= alumno.nombre %>"
+            data-apellidos="<%= alumno.apellidos %>"
+            data-telefono="<%= alumno.telefono %>"
+            data-correo="<%= alumno.correo_institucional %>"
+            data-matricula="<%= alumno.matricula %>"
+          >
+            <%= alumno.nombre %> <%= alumno.apellidos %>
+          </button>
+        </li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <div
+      id="modalAlumno"
+      class="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 hidden z-50"
+    >
+      <div
+        class="bg-gray-900 rounded-xl p-6 max-w-lg w-full shadow-lg relative text-gray-300"
+      >
+        <button
+          id="cerrarModal"
+          class="absolute top-3 right-3 text-teal-400 hover:text-teal-600 font-bold text-3xl leading-none focus:outline-none"
+        >
+          &times;
+        </button>
+        <h2 class="text-2xl font-bold mb-4 text-teal-400" id="modalNombre"></h2>
+        <p>
+          <strong>Teléfono:</strong>
+          <span id="modalTelefono" class="text-teal-300"></span>
+        </p>
+        <p>
+          <strong>Correo:</strong>
+          <span id="modalCorreo" class="text-teal-300"></span>
+        </p>
+        <p>
+          <strong>Matrícula:</strong>
+          <span id="modalMatricula" class="text-teal-300"></span>
+        </p>
+
+        <h3
+          class="mt-6 mb-3 font-semibold border-b border-teal-600 pb-1 text-teal-400"
+        >
+          Eventos creados:
+        </h3>
+        <ul
+          id="modalEventos"
+          class="list-disc list-inside max-h-48 overflow-y-auto space-y-1 text-gray-300"
+        ></ul>
+      </div>
+    </div>
+
+    <!-- Tabla eventos con atributos data para modal evento -->
+    <table
+      class="w-full border border-teal-600 rounded-lg shadow-lg overflow-hidden mx-4 md:mx-0"
+    >
+      <thead class="bg-gradient-to-r from-teal-800 to-gray-900 text-teal-400">
+        <tr>
+          <th
+            class="p-3 border-b border-teal-600 text-left text-sm md:text-base"
+          >
+            Título
+          </th>
+          <th
+            class="p-3 border-b border-teal-600 text-left text-sm md:text-base"
+          >
+            Descripción
+          </th>
+          <th
+            class="p-3 border-b border-teal-600 text-left text-sm md:text-base"
+          >
+            Alumno
+          </th>
+          <th
+            class="p-3 border-b border-teal-600 text-left text-sm md:text-base"
+          >
+            Matricula
+          </th>
+          <th
+            class="p-3 border-b border-teal-600 text-left text-sm md:text-base"
+          >
+            Imagen
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-gray-900 text-gray-300">
+        <% eventos.forEach(evento => { %>
+        <tr
+          class="border-b border-teal-700 hover:bg-teal-700 transition cursor-pointer"
+          data-titulo="<%= evento.titulo.replace(/"/g, '&quot;') %>"
+          data-descripcion="<%= evento.descripcion.replace(/"/g, '&quot;') %>"
+          data-alumno="<%= evento.usuario.nombre + ' ' + evento.usuario.apellidos %>"
+          data-matricula="<%= evento.usuario.matricula %>"
+          data-imagen="<%= evento.url_imagen || '' %>"
+        >
+          <td class="p-3 text-sm md:text-base"><%= evento.titulo %></td>
+          <td class="p-3 text-sm md:text-base"><%= evento.descripcion %></td>
+          <td class="p-3 text-sm md:text-base">
+            <%= evento.usuario.nombre %> <%= evento.usuario.apellidos %>
+          </td>
+          <td class="p-3 text-sm md:text-base">
+            <%= evento.usuario.matricula %>
+          </td>
+          <td class="p-3 text-sm md:text-base">
+            <% if (evento.url_imagen) { %>
+            <img
+              src="<%= evento.url_imagen %>"
+              alt="Imagen evento"
+              class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg border border-teal-600"
+            />
+            <% } else { %>
+            <span class="italic text-teal-500">Sin imagen</span>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Modal Detalle Evento -->
+    <div
+      id="modalEvento"
+      class="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 hidden z-50"
+    >
+<div
+  class="bg-gray-900 rounded-xl p-6 max-w-xl w-full shadow-lg relative text-gray-300 max-h-[90vh] overflow-y-auto"
+>
+
+        <button
+          id="cerrarModalEvento"
+          class="absolute top-3 right-3 text-teal-400 hover:text-teal-600 font-bold text-3xl leading-none focus:outline-none"
+        >
+          &times;
+        </button>
+
+        <h2 class="text-3xl font-bold mb-4 text-teal-400" id="modalEventoTitulo"></h2>
+        <img
+          id="modalEventoImagen"
+          src=""
+          alt="Imagen detallada evento"
+          class="w-full max-h-96 object-contain rounded-lg mb-4 border border-teal-600"
+        />
+        <p class="mb-4" id="modalEventoDescripcion"></p>
+        <p><strong>Alumno creador:</strong> <span id="modalEventoAlumno"></span></p>
+        <p><strong>Matricula:</strong> <span id="modalEventoAlumnoMatricula"></span></p>
+      </div>
+    </div>
+
+
+
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

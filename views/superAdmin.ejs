@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Panel Superadmin - Tema Oscuro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+
+  <body
+    class="bg-gray-900 text-gray-200 p-6 min-h-screen font-sans antialiased"
+  >
+    <div class="max-w-7xl mx-auto flex flex-col gap-8">
+      <!-- Header -->
+      <header
+        class="flex justify-between items-center py-4 border-b border-gray-700"
+      >
+        <h1
+          class="text-3xl font-extrabold text-indigo-400 tracking-tight select-none"
+        >
+          Panel Superadmin
+        </h1>
+        <form action="/logout" method="GET">
+          <button
+            type="submit"
+            class="bg-red-700 hover:bg-red-800 text-white px-5 py-2 rounded-md font-semibold transition"
+            title="Cerrar sesión"
+          >
+            Cerrar sesión
+          </button>
+        </form>
+      </header>
+
+      <main class="flex gap-10">
+        <!-- Usuarios -->
+        <section
+          class="w-1/3 bg-gray-800 rounded-lg border border-gray-700 p-6 overflow-y-auto max-h-[calc(100vh-160px)]"
+        >
+          <h2 class="text-xl font-semibold mb-6 text-indigo-300 tracking-wide">
+            Usuarios
+          </h2>
+          <ul class="divide-y divide-gray-700">
+            <% usuarios.forEach((usuario) => { %>
+            <li
+              class="flex justify-between items-center py-3 hover:bg-gray-700 rounded-md px-2 transition"
+            >
+              <a
+                href="/superadmin/editar-usuario/<%= usuario.id %>"
+                class="text-indigo-300 hover:text-indigo-400 font-medium truncate max-w-[75%]"
+              >
+                <%= usuario.nombre %> <%= usuario.apellidos %> (<%= usuario.rol
+                %>)
+              </a>
+              <% if (usuario.rol !== 'superadmin') { %>
+              <form
+                action="/superadmin/eliminar-usuario/<%= usuario.id %>"
+                method="POST"
+                class="inline"
+              >
+                <button
+                  type="submit"
+                  class="text-red-500 hover:text-red-600 text-sm font-semibold px-3 py-1 rounded transition"
+                  title="Eliminar usuario"
+                >
+                  Eliminar
+                </button>
+              </form>
+              <% } %>
+            </li>
+            <% }) %>
+          </ul>
+
+          <!-- Crear nuevo usuario -->
+          <section class="mt-10">
+            <h2
+              class="text-xl font-semibold mb-6 text-indigo-300 tracking-wide"
+            >
+              Crear Nuevo Usuario
+            </h2>
+            <form
+              action="/superadmin/crear-usuario"
+              method="POST"
+              class="space-y-5 max-w-full"
+            >
+              <div>
+                <label
+                  for="nombre"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Nombre</label
+                >
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  required
+                  placeholder="Juan"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="apellidos"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Apellidos</label
+                >
+                <input
+                  type="text"
+                  id="apellidos"
+                  name="apellidos"
+                  required
+                  placeholder="Pérez López"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="telefono"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Teléfono</label
+                >
+                <input
+                  type="text"
+                  id="telefono"
+                  name="telefono"
+                  value="<%= usuarioEditar ? usuarioEditar.telefono : '' %>"
+                  required
+                  placeholder="5512345678"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="correo_institucional"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Correo Institucional</label
+                >
+                <input
+                  type="email"
+                  id="correo_institucional"
+                  name="correo_institucional"
+                  placeholder="juan.perez@institucion.edu"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="matricula"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Matrícula</label
+                >
+                <input
+                  type="text"
+                  id="matricula"
+                  name="matricula"
+                  required
+                  placeholder="12345678"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="password"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Contraseña</label
+                >
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  placeholder="********"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="passwordConfirm"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Confirmar Contraseña</label
+                >
+                <input
+                  type="password"
+                  id="passwordConfirm"
+                  name="passwordConfirm"
+                  required
+                  placeholder="********"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="rol"
+                  class="block text-sm font-semibold mb-1 text-gray-300"
+                  >Rol</label
+                >
+                <select
+                  id="rol"
+                  name="rol"
+                  required
+                  class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                >
+                  <option value="alumno">Alumno</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-md transition"
+              >
+                Crear Usuario
+              </button>
+            </form>
+          </section>
+        </section>
+
+        <!-- Edición usuario -->
+        <section
+          class="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6 max-h-[calc(100vh-160px)] overflow-y-auto"
+        >
+          <h2
+            id="titulo-edicion"
+            class="text-xl font-semibold mb-6 text-indigo-300 hidden select-none"
+          ></h2>
+          <form
+            action=""
+            method="POST"
+            class="space-y-5 max-w-full"
+            id="form-editar-usuario"
+            style="display: none"
+          >
+            <div>
+              <label
+                for="nombre-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Nombre</label
+              >
+              <input
+                type="text"
+                id="nombre-editar"
+                name="nombre"
+                required
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                for="apellidos-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Apellidos</label
+              >
+              <input
+                type="text"
+                id="apellidos-editar"
+                name="apellidos"
+                required
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                for="telefono-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Teléfono</label
+              >
+              <input
+                type="text"
+                id="telefono-editar"
+                name="telefono"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                required
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                for="correo_institucional-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Correo Institucional</label
+              >
+              <input
+                type="email"
+                id="correo_institucional-editar"
+                name="correo_institucional"
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                for="matricula-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Matrícula</label
+              >
+              <input
+                type="text"
+                id="matricula-editar"
+                name="matricula"
+                required
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                for="rol-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Rol</label
+              >
+              <select
+                id="rol-editar"
+                name="rol"
+                required
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              >
+                <option value="alumno">Alumno</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="password-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Nueva contraseña (opcional)</label
+              >
+              <input
+                type="password"
+                id="password-editar"
+                name="password"
+                placeholder="Deja vacío para no cambiar"
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div>
+              <label
+                for="passwordConfirm-editar"
+                class="block text-sm font-semibold mb-1 text-gray-300"
+                >Confirmar contraseña</label
+              >
+              <input
+                type="password"
+                id="passwordConfirm-editar"
+                name="passwordConfirm"
+                placeholder="Confirma la nueva contraseña"
+                class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+            </div>
+
+            <div class="flex gap-4">
+              <button
+                type="submit"
+                class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-md transition"
+              >
+                Guardar cambios
+              </button>
+              <button
+                type="button"
+                id="btnCancelarEdicion"
+                class="flex-1 bg-red-700 hover:bg-red-800 text-white font-semibold py-2 rounded-md transition"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+
+          <p id="mensaje-inicio" class="text-gray-400 text-lg select-none">
+            Haz clic en un usuario para ver y editar sus datos.
+          </p>
+        </section>
+      </main>
+
+      <!-- Eventos -->
+      <section
+        class="max-w-7xl mx-auto mt-10 bg-gray-800 rounded-lg border border-gray-700 p-6"
+      >
+        <h2 class="text-xl font-semibold mb-6 text-indigo-300 tracking-wide">
+          Eventos
+        </h2>
+        <ul class="divide-y divide-gray-700">
+          <% eventos.forEach((evento) => { %>
+          <li
+            class="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 hover:bg-gray-700 rounded-md px-3 transition"
+          >
+            <div class="flex-1 min-w-0">
+              <strong class="block text-lg truncate text-indigo-200"
+                ><%= evento.titulo %></strong
+              >
+              <span class="text-gray-400 text-sm">
+                Creado por: <%= evento.usuario.nombre %> (<%=
+                evento.usuario.matricula %>)
+              </span>
+            </div>
+            <% if (evento.url_imagen) { %>
+            <img
+              src="<%= evento.url_imagen %>"
+              alt="Imagen del evento"
+              class="w-32 h-20 object-cover rounded-md"
+            />
+            <% } %>
+            <form
+              action="/superadmin/eliminar-evento/<%= evento.id %>"
+              method="POST"
+              class="inline"
+            >
+              <button
+                type="submit"
+                class="text-red-500 hover:text-red-600 text-sm font-semibold px-3 py-1 rounded transition"
+                title="Eliminar evento"
+              >
+                Eliminar
+              </button>
+            </form>
+          </li>
+          <% }) %>
+        </ul>
+      </section>
+    </div>
+
+    <script src="/js/superAdmin.js"></script>
+    <script>
+      // Mensajes SweetAlert2
+      <% if (typeof success !== "undefined" && success) { %>
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "<%= success %>",
+          timer: 2500,
+          showConfirmButton: false,
+          background: "#1e293b",
+          color: "#e0e7ff",
+        });
+      <% } %>
+
+      <% if (typeof error !== "undefined" && error) { %>
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "<%= error %>",
+          timer: 3500,
+          showConfirmButton: true,
+          background: "#1e293b",
+          color: "#e0e7ff",
+        });
+      <% } %>
+
+      // Manejo edición usuario
+      const form = document.getElementById("form-editar-usuario");
+      const mensajeInicio = document.getElementById("mensaje-inicio");
+      const tituloEdicion = document.getElementById("titulo-edicion");
+      const btnCancelar = document.getElementById("btnCancelarEdicion");
+
+      form.style.display = "none";
+      mensajeInicio.style.display = "block";
+      tituloEdicion.classList.add("hidden");
+
+      <% if (usuarioEditar) { %>
+        tituloEdicion.textContent = `Editar Usuario: <%= usuarioEditar.nombre %> <%= usuarioEditar.apellidos %>`;
+        form.action = "/superadmin/editar-usuario/<%= usuarioEditar.id %>";
+        document.getElementById("nombre-editar").value = "<%= usuarioEditar.nombre %>";
+        document.getElementById("apellidos-editar").value = "<%= usuarioEditar.apellidos %>";
+        document.getElementById("telefono-editar").value = "<%= usuarioEditar.telefono %>";
+        document.getElementById("correo_institucional-editar").value = "<%= usuarioEditar.correo_institucional || '' %>";
+        document.getElementById("matricula-editar").value = "<%= usuarioEditar.matricula %>";
+        document.getElementById("rol-editar").value = "<%= usuarioEditar.rol %>";
+        form.style.display = "block";
+        mensajeInicio.style.display = "none";
+        tituloEdicion.classList.remove("hidden");
+      <% } %>
+
+      btnCancelar.addEventListener("click", () => {
+        form.reset();
+        form.style.display = "none";
+        mensajeInicio.style.display = "block";
+        tituloEdicion.classList.add("hidden");
+      });
+    </script>
+  </body>
+</html>

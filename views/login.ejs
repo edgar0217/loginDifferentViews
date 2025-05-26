@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="min-h-screen pt-20 text-gray-800">
+    <!-- Barra de navegación (opcional) -->
+    <%- include("partials/navbar") %>
+
+    <!-- Contenedor principal -->
+    <section
+      class="flex items-center justify-center px-6 md:px-12 lg:px-24 py-16 min-h-screen"
+    >
+      <div
+        class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-8"
+      >
+        <h1 class="text-2xl font-bold text-center text-gray-900 mb-6">
+          Iniciar sesión
+        </h1>
+
+        <% if (error) { %>
+        <p class="text-center text-red-600 text-sm font-medium mb-4">
+          <%= error %>
+        </p>
+        <% } %>
+
+        <form class="space-y-4" method="POST" action="/login">
+          <div>
+            <label
+              for="matricula"
+              class="block mb-1 text-sm font-medium text-gray-700"
+              >Matrícula</label
+            >
+            <input
+              type="text"
+              name="matricula"
+              id="matricula"
+              placeholder="matrícula"
+              required
+              class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+            />
+          </div>
+
+          <div>
+            <label
+              for="password"
+              class="block mb-1 text-sm font-medium text-gray-700"
+              >Contraseña</label
+            >
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="••••••••"
+              required
+              class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-[#00176B] hover:bg-[#326ac0] text-white font-medium rounded-lg text-sm px-5 py-2.5 transition-colors"
+          >
+            Entrar
+          </button>
+
+          <a
+            href="/register"
+            class="block text-center text-sm text-gray-700 hover:underline mt-4"
+          >
+            ¿No tienes cuenta? Regístrate
+          </a>
+        </form>
+      </div>
+    </section>
+  </body>
+</html>

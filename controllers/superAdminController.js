@@ -53,18 +53,18 @@ export const eliminarUsuario = async (req, res) => {
     const usuario = await Usuario.findByPk(id);
     if (!usuario) {
       req.session.error = "Usuario no encontrado.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
     if (usuario.rol === "superadmin") {
       req.session.error = "No se puede eliminar un Superadmin.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
     await usuario.destroy();
     req.session.success = "Usuario eliminado correctamente.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   } catch (error) {
     req.session.error = "Error al eliminar usuario.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   }
 };
 
@@ -74,17 +74,17 @@ export const eliminarEvento = async (req, res) => {
     const evento = await Evento.findByPk(id);
     if (!evento) {
       req.session.error = "Evento no encontrado.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
     if (evento.public_id_imagen) {
       await cloudinary.uploader.destroy(evento.public_id_imagen);
     }
     await evento.destroy();
     req.session.success = "Evento eliminado correctamente.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   } catch (error) {
     req.session.error = "Error al eliminar evento.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   }
 };
 
@@ -93,7 +93,7 @@ export const mostrarEditarUsuario = async (req, res) => {
     const usuario = await Usuario.findByPk(req.params.id);
     if (!usuario) {
       req.session.error = "Usuario no encontrado.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
     const usuarios = await Usuario.findAll();
     const page = parseInt(req.query.page) || 1;
@@ -121,7 +121,7 @@ export const mostrarEditarUsuario = async (req, res) => {
     });
   } catch (error) {
     req.session.error = "Error al cargar datos del usuario.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   }
 };
 
@@ -142,13 +142,13 @@ export const actualizarUsuario = async (req, res) => {
     const usuarioDB = await Usuario.findByPk(req.params.id);
     if (!usuarioDB) {
       req.session.error = "Usuario no encontrado.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
 
     if (password || passwordConfirm) {
       if (password !== passwordConfirm) {
         req.session.error = "Las contraseñas no coinciden.";
-        return res.redirect(`/superadmin/editar-usuario/${req.params.id}`);
+        return res.redirect(`/superAdmin/editar-usuario/${req.params.id}`);
       }
       usuarioDB.password = await bcrypt.hash(password, saltRounds);
     }
@@ -165,11 +165,11 @@ export const actualizarUsuario = async (req, res) => {
     });
 
     req.session.success = "Usuario actualizado correctamente.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   } catch (error) {
     console.error(error);
     req.session.error = "Error al actualizar usuario.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   }
 };
 
@@ -199,17 +199,17 @@ export const crearUsuario = async (req, res) => {
       !rol
     ) {
       req.session.error = "Por favor, completa todos los campos obligatorios.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
 
     if (rol === "superadmin") {
       req.session.error = "No puedes crear un usuario con rol Superadmin.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
 
     if (password !== passwordConfirm) {
       req.session.error = "Las contraseñas no coinciden.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
 
     const existe = await Usuario.findOne({
@@ -217,7 +217,7 @@ export const crearUsuario = async (req, res) => {
     });
     if (existe) {
       req.session.error = "El nombre de usuario ya está registrado.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -234,11 +234,11 @@ export const crearUsuario = async (req, res) => {
     });
 
     req.session.success = "Usuario creado correctamente.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   } catch (error) {
     console.error(error);
     req.session.error = "Error al crear usuario.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   }
 };
 
@@ -396,7 +396,7 @@ export const actualizarEvento = async (req, res) => {
     const evento = await Evento.findByPk(req.params.id);
     if (!evento) {
       req.session.error = "Evento no encontrado.";
-      return res.redirect("/superadmin");
+      return res.redirect("/superAdmin");
     }
 
     await evento.update({
@@ -406,10 +406,10 @@ export const actualizarEvento = async (req, res) => {
     });
 
     req.session.success = "Evento actualizado correctamente.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   } catch (error) {
     console.error(error);
     req.session.error = "Error al actualizar evento.";
-    res.redirect("/superadmin");
+    res.redirect("/superAdmin");
   }
 };

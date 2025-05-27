@@ -1,9 +1,8 @@
 import { DataTypes } from "sequelize";
 import db from "../config/db.js";
-import Usuario from "../models/userModel.js";
+import Usuario from "./userModel.js";
 
-// Definición del modelo Evento
-const Evento = db.define("Evento", {
+const Evento = db.define("evento", {
   titulo: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -26,12 +25,7 @@ const Evento = db.define("Evento", {
   },
 });
 
-// Asociaciones
-Usuario.hasMany(Evento, {
-  foreignKey: "usuarioId",
-});
-Evento.belongsTo(Usuario, {
-  foreignKey: "usuarioId",
-});
+Usuario.hasMany(Evento, { foreignKey: "usuarioId" });
+Evento.belongsTo(Usuario, { foreignKey: "usuarioId" });
 
 export default Evento;

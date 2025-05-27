@@ -3,19 +3,15 @@ import Evento from "../models/eventoModel.js";
 export const mostrarEventos = async (req, res) => {
   try {
     const usuarioId = req.session.usuario.id;
-
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
 
-    // Contar total de eventos
     const totalEventos = await Evento.count({ where: { usuarioId } });
     const totalPages = Math.max(1, Math.ceil(totalEventos / limit));
 
-    // Validar página para que esté entre 1 y totalPages
     const safePage = Math.min(Math.max(page, 1), totalPages);
     const offset = (safePage - 1) * limit;
 
-    // Obtener eventos paginados
     const eventos = await Evento.findAll({
       where: { usuarioId },
       order: [["createdAt", "DESC"]],
@@ -32,9 +28,9 @@ export const mostrarEventos = async (req, res) => {
       eventos,
       error,
       success,
+      usuario: req.session.usuario,
       currentPage: safePage,
       totalPages,
-      usuario: req.session.usuario, // Asegúrate de pasar usuario para la vista
     });
   } catch (error) {
     console.error(error);
@@ -42,9 +38,9 @@ export const mostrarEventos = async (req, res) => {
       eventos: [],
       error: "Error cargando eventos",
       success: null,
+      usuario: req.session.usuario,
       currentPage: 1,
       totalPages: 0,
-      usuario: req.session.usuario,
     });
   }
 };

@@ -14,14 +14,16 @@ import Usuario from "./models/userModel.js";
 
     // Crear admin
     const adminPassword = await bcrypt.hash("123", saltRounds);
-    const admin = await Usuario.findOne({ where: { matricula: "echino0217" } });
+    const admin = await Usuario.findOne({ where: { usuario: "superadmin" } });
+
     if (!admin) {
       await Usuario.create({
-        nombre: "EDGAR ",
-        apellidos: "GARCÍA",
-        telefono: "7821356726",
-        correo_institucional: "admin@itspr.edu.mx",
-        matricula: "echino0217",
+        nombre: "EZEQUIEL",
+        usuario: "ezequiel0217",
+        direccion: "Calle Falsa 123", // Agrega dirección real si es necesario
+        municipio: "Tuxpan",
+        seccion_electoral: "1020",
+        celular: "7821356726",
         password: adminPassword,
         rol: "superadmin",
       });

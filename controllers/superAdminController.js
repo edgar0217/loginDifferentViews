@@ -3,6 +3,7 @@ import Evento from "../models/eventoModel.js";
 import { cloudinary } from "../config/cloudinary.js";
 import bcrypt from "bcrypt";
 import { generateReportePDF } from "../utils/pdfGenerator.js";
+import { Op } from "sequelize";
 
 const saltRounds = 10;
 
@@ -41,6 +42,7 @@ export const vistaSuperAdmin = async (req, res) => {
       error,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).send("Error al cargar la vista del superadmin");
   }
 };
@@ -94,11 +96,25 @@ export const mostrarEditarUsuario = async (req, res) => {
       return res.redirect("/superadmin");
     }
     const usuarios = await Usuario.findAll();
-    const eventos = await Evento.findAll({ include: Usuario });
+    const page = parseInt(req.query.page) || 1;
+    const limit = 20;
+    const offset = (page - 1) * limit;
+    const { count: eventosCount, rows: eventos } = await Evento.findAndCountAll(
+      {
+        include: Usuario,
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
+      }
+    );
+    const totalPages = Math.ceil(eventosCount / limit);
 
     res.render("superadmin", {
       usuarios,
       eventos,
+      eventosCount,
+      totalPages,
+      currentPage: page,
       usuarioEditar: usuario,
       success: null,
       error: null,
@@ -113,17 +129,18 @@ export const actualizarUsuario = async (req, res) => {
   try {
     const {
       nombre,
-      apellidos,
-      telefono,
-      correo_institucional,
-      matricula,
+      usuario,
+      direccion,
+      municipio,
+      seccion_electoral,
+      celular,
       rol,
       password,
       passwordConfirm,
     } = req.body;
 
-    const usuario = await Usuario.findByPk(req.params.id);
-    if (!usuario) {
+    const usuarioDB = await Usuario.findByPk(req.params.id);
+    if (!usuarioDB) {
       req.session.error = "Usuario no encontrado.";
       return res.redirect("/superadmin");
     }
@@ -133,20 +150,18 @@ export const actualizarUsuario = async (req, res) => {
         req.session.error = "Las contraseñas no coinciden.";
         return res.redirect(`/superadmin/editar-usuario/${req.params.id}`);
       }
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-      usuario.password = hashedPassword;
+      usuarioDB.password = await bcrypt.hash(password, saltRounds);
     }
 
-    await usuario.update({
+    await usuarioDB.update({
       nombre: nombre.toLowerCase(),
-      apellidos: apellidos.toLowerCase(),
-      telefono: telefono.toLowerCase(),
-      correo_institucional: correo_institucional
-        ? correo_institucional.toLowerCase()
-        : null,
-      matricula: matricula.toLowerCase(),
+      usuario: usuario.toLowerCase(),
+      direccion: direccion.toLowerCase(),
+      municipio: municipio.toLowerCase(),
+      seccion_electoral: seccion_electoral.toLowerCase(),
+      celular: celular,
       rol,
-      password: usuario.password,
+      password: usuarioDB.password,
     });
 
     req.session.success = "Usuario actualizado correctamente.";
@@ -162,10 +177,11 @@ export const crearUsuario = async (req, res) => {
   try {
     const {
       nombre,
-      apellidos,
-      telefono,
-      correo_institucional,
-      matricula,
+      usuario,
+      direccion,
+      municipio,
+      seccion_electoral,
+      celular,
       password,
       passwordConfirm,
       rol,
@@ -173,9 +189,11 @@ export const crearUsuario = async (req, res) => {
 
     if (
       !nombre ||
-      !apellidos ||
-      !telefono ||
-      !matricula ||
+      !usuario ||
+      !direccion ||
+      !municipio ||
+      !seccion_electoral ||
+      !celular ||
       !password ||
       !passwordConfirm ||
       !rol
@@ -195,10 +213,10 @@ export const crearUsuario = async (req, res) => {
     }
 
     const existe = await Usuario.findOne({
-      where: { matricula: matricula.toLowerCase() },
+      where: { usuario: usuario.toLowerCase() },
     });
     if (existe) {
-      req.session.error = "La matrícula ya está registrada.";
+      req.session.error = "El nombre de usuario ya está registrado.";
       return res.redirect("/superadmin");
     }
 
@@ -206,12 +224,11 @@ export const crearUsuario = async (req, res) => {
 
     await Usuario.create({
       nombre: nombre.toLowerCase(),
-      apellidos: apellidos.toLowerCase(),
-      telefono: telefono.toLowerCase(),
-      correo_institucional: correo_institucional
-        ? correo_institucional.toLowerCase()
-        : null,
-      matricula: matricula.toLowerCase(),
+      usuario: usuario.toLowerCase(),
+      direccion: direccion.toLowerCase(),
+      municipio: municipio.toLowerCase(),
+      seccion_electoral: seccion_electoral.toLowerCase(),
+      celular: celular,
       password: hashedPassword,
       rol,
     });
@@ -232,24 +249,167 @@ export const descargarReportePDF = async (req, res) => {
       attributes: [
         "id",
         "nombre",
-        "apellidos",
-        "matricula",
-        "telefono",
-        "correo_institucional",
+        "usuario",
+        "direccion",
+        "municipio",
+        "seccion_electoral",
+        "celular",
         "createdAt",
       ],
     });
 
     const eventos = await Evento.findAll({ include: Usuario });
 
-    await generateReportePDF(res, usuarios, eventos, {
-      titulo: "Reporte de Usuarios y Eventos",
-      tituloColor: "#4F46E5",
-      encabezadoColor: "#2563EB",
-      filename: "reporte_superadmin.pdf",
-    });
+    const totalUsuarios = await Usuario.count();
+    const totalAlumnos = await Usuario.count({ where: { rol: "alumno" } });
+    const totalEventos = await Evento.count();
+
+    await generateReportePDF(
+      res,
+      usuarios,
+      eventos,
+      {
+        titulo: "Reporte de Usuarios y Eventos",
+        tituloColor: "#4F46E5",
+        encabezadoColor: "#2563EB",
+        filename: "reporte_superadmin.pdf",
+      },
+      {
+        totalUsuarios,
+        totalAlumnos,
+        totalEventos,
+      }
+    );
   } catch (error) {
     console.error("Error generando reporte PDF:", error);
     res.status(500).send("Error generando el reporte PDF");
+  }
+};
+
+export const descargarReportePozaRica = async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll({
+      where: { rol: "alumno" },
+      attributes: [
+        "id",
+        "nombre",
+        "usuario",
+        "direccion",
+        "municipio",
+        "seccion_electoral",
+        "celular",
+        "createdAt",
+      ],
+    });
+
+    const eventos = await Evento.findAll({
+      include: Usuario,
+      where: {
+        descripcion: {
+          [Op.iLike]: "%poza rica%",
+        },
+      },
+    });
+
+    const totalAlumnos = await Usuario.count({ where: { rol: "alumno" } });
+    const totalEventos = await Evento.count({
+      where: { descripcion: { [Op.iLike]: "%poza rica%" } },
+    });
+
+    await generateReportePDF(
+      res,
+      usuarios,
+      eventos,
+      {
+        titulo: "Reporte Poza Rica - Convencidos y Eventos",
+        tituloColor: "#1D4ED8",
+        encabezadoColor: "#2563EB",
+        filename: "reporte_poza_rica_superadmin.pdf",
+      },
+      {
+        totalAlumnos,
+        totalEventos,
+      }
+    );
+  } catch (error) {
+    console.error("Error generando reporte Poza Rica:", error);
+    res.status(500).send("Error generando el reporte Poza Rica");
+  }
+};
+
+export const descargarReporteCoatzintla = async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll({
+      where: { rol: "alumno" },
+      attributes: [
+        "id",
+        "nombre",
+        "usuario",
+        "direccion",
+        "municipio",
+        "seccion_electoral",
+        "celular",
+        "createdAt",
+      ],
+    });
+
+    const eventos = await Evento.findAll({
+      include: Usuario,
+      where: {
+        descripcion: {
+          [Op.iLike]: "%coatzintla%",
+        },
+      },
+    });
+
+    const totalAlumnos = await Usuario.count({ where: { rol: "alumno" } });
+    const totalEventos = await Evento.count({
+      where: { descripcion: { [Op.iLike]: "%coatzintla%" } },
+    });
+
+    await generateReportePDF(
+      res,
+      usuarios,
+      eventos,
+      {
+        titulo: "Reporte Coatzintla - Convencidos y Eventos",
+        tituloColor: "#059669",
+        encabezadoColor: "#10B981",
+        filename: "reporte_coatzintla_superadmin.pdf",
+      },
+      {
+        totalAlumnos,
+        totalEventos,
+      }
+    );
+  } catch (error) {
+    console.error("Error generando reporte Coatzintla:", error);
+    res.status(500).send("Error generando el reporte Coatzintla");
+  }
+};
+
+// NUEVO: Actualizar evento con datos recibidos
+export const actualizarEvento = async (req, res) => {
+  try {
+    const { titulo, descripcion, usuarioId } = req.body;
+
+    const evento = await Evento.findByPk(req.params.id);
+    if (!evento) {
+      req.session.error = "Evento no encontrado.";
+      return res.redirect("/superadmin");
+    }
+
+    await evento.update({
+      titulo,
+      descripcion,
+      usuarioId,
+    });
+
+    req.session.success = "Evento actualizado correctamente.";
+    res.redirect("/superadmin");
+  } catch (error) {
+    console.error(error);
+    req.session.error = "Error al actualizar evento.";
+    res.redirect("/superadmin");
   }
 };

@@ -1,13 +1,21 @@
 // utils/pdfGenerator.js
 import PDFDocument from "pdfkit";
 
-export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
+export const generateReportePDF = (
+  res,
+  usuarios,
+  eventos,
+  options = {},
+  summary = {}
+) => {
   const {
     titulo = "Reporte de Usuarios y Eventos",
-    tituloColor = "#047857", // color del título principal
-    encabezadoColor = "#059669", // color de los encabezados de tablas
-    filename = "reporte.pdf", // nombre del archivo PDF
+    tituloColor = "#047857",
+    encabezadoColor = "#059669",
+    filename = "reporte.pdf",
   } = options;
+
+  const { totalAlumnos = null, totalEventos = null } = summary;
 
   const doc = new PDFDocument({ margin: 30, size: "A4" });
 
@@ -20,22 +28,35 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
   doc.fontSize(20).fillColor(tituloColor).text(titulo, { align: "center" });
   doc.moveDown();
 
-  // Tabla Usuarios
+  // Resumen conteos al inicio (Convencidos y Eventos)
+  if (totalAlumnos !== null && totalEventos !== null) {
+    doc.fontSize(14).fillColor("black").text("Resumen de registros:", {
+      underline: true,
+    });
+    doc.moveDown(0.5);
+
+    doc.fontSize(12).fillColor("black").text(`Convencidos: ${totalAlumnos}`);
+    doc.text(`Eventos: ${totalEventos}`);
+    doc.moveDown(1.5);
+  }
+
+  // Tabla Convencidos
   doc
     .fontSize(16)
     .fillColor(encabezadoColor)
-    .text("Usuarios (Alumnos)", { underline: true });
+    .text("Convencidos", { underline: true });
   doc.moveDown(0.5);
 
   const userTableTop = doc.y;
   const userColWidths = {
     id: 30,
-    nombre: 100,
-    apellidos: 100,
-    matricula: 70,
-    telefono: 70,
-    correo: 120,
-    creado: 80,
+    nombre: 90,
+    usuario: 70,
+    direccion: 110,
+    municipio: 65,
+    seccion: 65,
+    celular: 70,
+    creado: 70,
   };
 
   // Encabezados tabla usuarios
@@ -48,60 +69,134 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
       align: "center",
     })
     .text(
-      "Apellidos",
+      "Usuario",
       30 + userColWidths.id + userColWidths.nombre,
       userTableTop,
-      { width: userColWidths.apellidos, align: "center" }
+      {
+        width: userColWidths.usuario,
+        align: "center",
+      }
     )
     .text(
-      "Matrícula",
-      30 + userColWidths.id + userColWidths.nombre + userColWidths.apellidos,
+      "Dirección",
+      30 + userColWidths.id + userColWidths.nombre + userColWidths.usuario,
       userTableTop,
-      { width: userColWidths.matricula, align: "center" }
+      {
+        width: userColWidths.direccion,
+        align: "center",
+      }
     )
     .text(
-      "Teléfono",
+      "Municipio",
       30 +
         userColWidths.id +
         userColWidths.nombre +
-        userColWidths.apellidos +
-        userColWidths.matricula,
+        userColWidths.usuario +
+        userColWidths.direccion,
       userTableTop,
-      { width: userColWidths.telefono, align: "center" }
+      {
+        width: userColWidths.municipio,
+        align: "center",
+      }
     )
     .text(
-      "Correo",
+      "Sección",
       30 +
         userColWidths.id +
         userColWidths.nombre +
-        userColWidths.apellidos +
-        userColWidths.matricula +
-        userColWidths.telefono,
+        userColWidths.usuario +
+        userColWidths.direccion +
+        userColWidths.municipio,
       userTableTop,
-      { width: userColWidths.correo, align: "center" }
+      {
+        width: userColWidths.seccion,
+        align: "center",
+      }
+    )
+    .text(
+      "Celular",
+      30 +
+        userColWidths.id +
+        userColWidths.nombre +
+        userColWidths.usuario +
+        userColWidths.direccion +
+        userColWidths.municipio +
+        userColWidths.seccion,
+      userTableTop,
+      {
+        width: userColWidths.celular,
+        align: "center",
+      }
     )
     .text(
       "Creado",
       30 +
         userColWidths.id +
         userColWidths.nombre +
-        userColWidths.apellidos +
-        userColWidths.matricula +
-        userColWidths.telefono +
-        userColWidths.correo,
+        userColWidths.usuario +
+        userColWidths.direccion +
+        userColWidths.municipio +
+        userColWidths.seccion +
+        userColWidths.celular,
       userTableTop,
-      { width: userColWidths.creado, align: "center" }
+      {
+        width: userColWidths.creado,
+        align: "center",
+      }
     );
 
   // Línea debajo encabezados usuarios
   doc
     .moveTo(30, userTableTop + 15)
-    .lineTo(570, userTableTop + 15)
+    .lineTo(
+      30 + Object.values(userColWidths).reduce((a, b) => a + b, 0),
+      userTableTop + 15
+    )
     .stroke();
 
-  // Filas usuarios
+  // Filas usuarios con altura variable
   let y = userTableTop + 20;
   usuarios.forEach((u) => {
+    const alturaNombre = doc.heightOfString(capitalize(u.nombre), {
+      width: userColWidths.nombre,
+      align: "left",
+    });
+    const alturaUsuario = doc.heightOfString(u.usuario, {
+      width: userColWidths.usuario,
+      align: "left",
+    });
+    const alturaDireccion = doc.heightOfString(u.direccion, {
+      width: userColWidths.direccion,
+      align: "left",
+    });
+    const alturaMunicipio = doc.heightOfString(u.municipio, {
+      width: userColWidths.municipio,
+      align: "left",
+    });
+    const alturaSeccion = doc.heightOfString(u.seccion_electoral, {
+      width: userColWidths.seccion,
+      align: "left",
+    });
+    const alturaCelular = doc.heightOfString(u.celular, {
+      width: userColWidths.celular,
+      align: "left",
+    });
+    const alturaCreado = doc.heightOfString(formatDate(u.createdAt), {
+      width: userColWidths.creado,
+      align: "center",
+    });
+
+    const filaAltura = Math.max(
+      15,
+      alturaNombre,
+      alturaUsuario,
+      alturaDireccion,
+      alturaMunicipio,
+      alturaSeccion,
+      alturaCelular,
+      alturaCreado
+    );
+
     doc
       .fontSize(9)
       .text(u.id.toString(), 30, y, {
@@ -111,53 +206,74 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
       .text(capitalize(u.nombre), 30 + userColWidths.id, y, {
         width: userColWidths.nombre,
       })
+      .text(u.usuario, 30 + userColWidths.id + userColWidths.nombre, y, {
+        width: userColWidths.usuario,
+      })
       .text(
-        capitalize(u.apellidos),
-        30 + userColWidths.id + userColWidths.nombre,
+        u.direccion,
+        30 + userColWidths.id + userColWidths.nombre + userColWidths.usuario,
         y,
-        { width: userColWidths.apellidos }
+        {
+          width: userColWidths.direccion,
+        }
       )
       .text(
-        u.matricula,
-        30 + userColWidths.id + userColWidths.nombre + userColWidths.apellidos,
-        y,
-        { width: userColWidths.matricula, align: "center" }
-      )
-      .text(
-        u.telefono,
+        u.municipio,
         30 +
           userColWidths.id +
           userColWidths.nombre +
-          userColWidths.apellidos +
-          userColWidths.matricula,
+          userColWidths.usuario +
+          userColWidths.direccion,
         y,
-        { width: userColWidths.telefono, align: "center" }
+        {
+          width: userColWidths.municipio,
+        }
       )
       .text(
-        u.correo_institucional || "N/A",
+        u.seccion_electoral,
         30 +
           userColWidths.id +
           userColWidths.nombre +
-          userColWidths.apellidos +
-          userColWidths.matricula +
-          userColWidths.telefono,
+          userColWidths.usuario +
+          userColWidths.direccion +
+          userColWidths.municipio,
         y,
-        { width: userColWidths.correo }
+        {
+          width: userColWidths.seccion,
+        }
+      )
+      .text(
+        u.celular,
+        30 +
+          userColWidths.id +
+          userColWidths.nombre +
+          userColWidths.usuario +
+          userColWidths.direccion +
+          userColWidths.municipio +
+          userColWidths.seccion,
+        y,
+        {
+          width: userColWidths.celular,
+        }
       )
       .text(
         formatDate(u.createdAt),
         30 +
           userColWidths.id +
           userColWidths.nombre +
-          userColWidths.apellidos +
-          userColWidths.matricula +
-          userColWidths.telefono +
-          userColWidths.correo,
+          userColWidths.usuario +
+          userColWidths.direccion +
+          userColWidths.municipio +
+          userColWidths.seccion +
+          userColWidths.celular,
         y,
-        { width: userColWidths.creado, align: "center" }
+        {
+          width: userColWidths.creado,
+          align: "center",
+        }
       );
 
-    y += 15;
+    y += filaAltura + 5;
     if (y > 750) {
       doc.addPage();
       y = 50;
@@ -176,10 +292,10 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
   const eventTableTop = doc.y;
   const eventColWidths = {
     id: 30,
-    titulo: 100,
-    descripcion: 170,
-    creadoPor: 160,
-    fecha: 90,
+    titulo: 110,
+    descripcion: 160,
+    creador: 120,
+    fecha: 80,
   };
 
   // Encabezados tabla eventos
@@ -198,57 +314,90 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
       "Descripción",
       30 + eventColWidths.id + eventColWidths.titulo,
       eventTableTop,
-      { width: eventColWidths.descripcion, align: "center" }
+      {
+        width: eventColWidths.descripcion,
+        align: "center",
+      }
     )
     .text(
-      "Creado por(Nombre y Matrícula)",
+      "Creado por",
       30 +
         eventColWidths.id +
         eventColWidths.titulo +
         eventColWidths.descripcion,
       eventTableTop,
-      { width: eventColWidths.creadoPor, align: "center" }
+      {
+        width: eventColWidths.creador,
+        align: "center",
+      }
     )
     .text(
-      "Fecha creación",
+      "Fecha",
       30 +
         eventColWidths.id +
         eventColWidths.titulo +
         eventColWidths.descripcion +
-        eventColWidths.creadoPor,
+        eventColWidths.creador,
       eventTableTop,
-      { width: eventColWidths.fecha, align: "center" }
+      {
+        width: eventColWidths.fecha,
+        align: "center",
+      }
     );
 
   // Línea debajo encabezados eventos
   doc
     .moveTo(30, eventTableTop + 15)
-    .lineTo(580, eventTableTop + 15)
+    .lineTo(
+      30 + Object.values(eventColWidths).reduce((a, b) => a + b, 0),
+      eventTableTop + 15
+    )
     .stroke();
 
-  // Filas eventos
-  y = eventTableTop + 20;
+  // Filas eventos con altura variable
+  let yEventos = eventTableTop + 20;
   eventos.forEach((e) => {
-    const creadorNombre = e.usuario
-      ? capitalize(e.usuario.nombre) + " " + capitalize(e.usuario.apellidos)
+    const creador = e.usuario
+      ? capitalize(e.usuario.nombre) + " (" + e.usuario.usuario + ")"
       : "N/D";
-    const creadorMatricula = e.usuario ? e.usuario.matricula : "N/D";
-    const creador = `${creadorNombre} (${creadorMatricula})`;
+
+    const alturaTitulo = doc.heightOfString(e.titulo || "", {
+      width: eventColWidths.titulo,
+    });
+    const alturaDescripcion = doc.heightOfString(e.descripcion || "", {
+      width: eventColWidths.descripcion,
+    });
+    const alturaCreador = doc.heightOfString(creador, {
+      width: eventColWidths.creador,
+    });
+    const alturaFecha = doc.heightOfString(formatDate(e.createdAt), {
+      width: eventColWidths.fecha,
+    });
+
+    const filaAltura = Math.max(
+      15,
+      alturaTitulo,
+      alturaDescripcion,
+      alturaCreador,
+      alturaFecha
+    );
 
     doc
       .fontSize(9)
-      .text(e.id.toString(), 30, y, {
+      .text(e.id.toString(), 30, yEventos, {
         width: eventColWidths.id,
         align: "center",
       })
-      .text(truncateText(e.titulo, 30), 30 + eventColWidths.id, y, {
+      .text(e.titulo || "", 30 + eventColWidths.id, yEventos, {
         width: eventColWidths.titulo,
       })
       .text(
-        truncateText(e.descripcion || "", 60),
+        e.descripcion || "",
         30 + eventColWidths.id + eventColWidths.titulo,
-        y,
-        { width: eventColWidths.descripcion }
+        yEventos,
+        {
+          width: eventColWidths.descripcion,
+        }
       )
       .text(
         creador,
@@ -256,8 +405,10 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
           eventColWidths.id +
           eventColWidths.titulo +
           eventColWidths.descripcion,
-        y,
-        { width: eventColWidths.creadoPor }
+        yEventos,
+        {
+          width: eventColWidths.creador,
+        }
       )
       .text(
         formatDate(e.createdAt),
@@ -265,15 +416,18 @@ export const generateReportePDF = (res, usuarios, eventos, options = {}) => {
           eventColWidths.id +
           eventColWidths.titulo +
           eventColWidths.descripcion +
-          eventColWidths.creadoPor,
-        y,
-        { width: eventColWidths.fecha, align: "center" }
+          eventColWidths.creador,
+        yEventos,
+        {
+          width: eventColWidths.fecha,
+          align: "center",
+        }
       );
 
-    y += 15;
-    if (y > 750) {
+    yEventos += filaAltura + 5;
+    if (yEventos > 750) {
       doc.addPage();
-      y = 50;
+      yEventos = 50;
     }
   });
 
@@ -291,10 +445,4 @@ export const formatDate = (date) => {
   if (!date) return "";
   const d = new Date(date);
   return d.toLocaleDateString("es-MX");
-};
-
-export const truncateText = (text, maxLength) => {
-  if (!text) return "";
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + "...";
 };

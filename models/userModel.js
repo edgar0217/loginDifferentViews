@@ -1,29 +1,31 @@
 import { DataTypes } from "sequelize";
 import db from "../config/db.js";
 
-// Definición del modelo Usuario
 const Usuario = db.define("usuario", {
   nombre: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  apellidos: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  telefono: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  correo_institucional: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: { isEmail: true },
-  },
-  matricula: {
+  usuario: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
+  },
+  direccion: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  municipio: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  seccion_electoral: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  celular: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   password: {
     type: DataTypes.STRING,

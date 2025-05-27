@@ -11,36 +11,41 @@ export const registroPost = async (req, res) => {
   try {
     let {
       nombre,
-      apellidos,
-      telefono,
-      correo_institucional,
-      matricula,
+      usuario,
+      direccion,
+      municipio,
+      seccion_electoral,
+      celular,
       password,
     } = req.body;
 
-    // Convertir a minúsculas antes de guardar
-    nombre = nombre.toLowerCase();
-    apellidos = apellidos.toLowerCase();
-    telefono = telefono.toLowerCase();
-    correo_institucional = correo_institucional
-      ? correo_institucional.toLowerCase()
-      : null;
-    matricula = matricula.toLowerCase();
+    // Normalizar usuario para evitar duplicados (minúsculas)
+    usuario = usuario.toLowerCase();
+    nombre = nombre.trim();
+    direccion = direccion.trim();
+    municipio = municipio.trim();
+    seccion_electoral = seccion_electoral.trim();
+    celular = celular.trim();
 
-    const existe = await Usuario.findOne({ where: { matricula } });
+    // Validar que el usuario no exista
+    const existe = await Usuario.findOne({ where: { usuario } });
     if (existe) {
       return res.render("register", {
-        error: "La matrícula ya está registrada.",
+        error: "El usuario ya está en uso, elige otro.",
       });
     }
 
+    // Hashear la contraseña
     const hash = await bcrypt.hash(password, saltRounds);
+
+    // Crear nuevo usuario
     await Usuario.create({
       nombre,
-      apellidos,
-      telefono,
-      correo_institucional,
-      matricula,
+      usuario,
+      direccion,
+      municipio,
+      seccion_electoral,
+      celular,
       password: hash,
       rol: "alumno",
     });
@@ -58,35 +63,33 @@ export const loginGet = (req, res) => {
 
 export const loginPost = async (req, res) => {
   try {
-    const matricula = req.body.matricula.toLowerCase(); // convertir a minúsculas para buscar
+    const usuario = req.body.usuario.toLowerCase();
     const password = req.body.password;
 
-    const usuario = await Usuario.findOne({ where: { matricula } });
-    if (!usuario) {
+    const user = await Usuario.findOne({ where: { usuario } });
+    if (!user) {
       return res.render("login", {
-        error: "Matrícula o contraseña incorrecta.",
+        error: "Usuario o contraseña incorrecta.",
       });
     }
-    const match = await bcrypt.compare(password, usuario.password);
+
+    const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.render("login", {
-        error: "Matrícula o contraseña incorrecta.",
+        error: "Usuario o contraseña incorrecta.",
       });
     }
+
+    // Guardar sesión con nombre y usuario
     req.session.usuario = {
-      id: usuario.id,
-      nombre: usuario.nombre,
-      apellidos: usuario.apellidos,
-      rol: usuario.rol,
+      id: user.id,
+      nombre: user.nombre,
+      usuario: user.usuario, // <--- agregado aquí
+      rol: user.rol,
     };
 
-    if (usuario.rol === "superadmin") {
-      return res.redirect("/superadmin");
-    }
-
-    if (usuario.rol === "admin") {
-      return res.redirect("/admin/eventos");
-    }
+    if (user.rol === "superadmin") return res.redirect("/superadmin");
+    if (user.rol === "admin") return res.redirect("/admin/eventos");
 
     res.redirect("/eventos");
   } catch (error) {
@@ -96,5 +99,7 @@ export const loginPost = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  req.session.destroy(() => res.redirect("/login"));
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
 };

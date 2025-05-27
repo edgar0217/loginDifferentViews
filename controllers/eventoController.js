@@ -1,11 +1,26 @@
-import { cloudinary } from "../config/cloudinary.js";
 import Evento from "../models/eventoModel.js";
 
 export const mostrarEventos = async (req, res) => {
   try {
+    const usuarioId = req.session.usuario.id;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+
+    // Contar total de eventos
+    const totalEventos = await Evento.count({ where: { usuarioId } });
+    const totalPages = Math.max(1, Math.ceil(totalEventos / limit));
+
+    // Validar página para que esté entre 1 y totalPages
+    const safePage = Math.min(Math.max(page, 1), totalPages);
+    const offset = (safePage - 1) * limit;
+
+    // Obtener eventos paginados
     const eventos = await Evento.findAll({
-      where: { usuarioId: req.session.usuario.id },
+      where: { usuarioId },
       order: [["createdAt", "DESC"]],
+      limit,
+      offset,
     });
 
     const error = req.session.error || null;
@@ -13,13 +28,23 @@ export const mostrarEventos = async (req, res) => {
     req.session.error = null;
     req.session.success = null;
 
-    res.render("eventos", { eventos, error, success });
+    res.render("eventos", {
+      eventos,
+      error,
+      success,
+      currentPage: safePage,
+      totalPages,
+      usuario: req.session.usuario, // Asegúrate de pasar usuario para la vista
+    });
   } catch (error) {
     console.error(error);
     res.render("eventos", {
       eventos: [],
       error: "Error cargando eventos",
       success: null,
+      currentPage: 1,
+      totalPages: 0,
+      usuario: req.session.usuario,
     });
   }
 };
@@ -28,7 +53,6 @@ export const crearEvento = async (req, res) => {
   try {
     let { titulo, descripcion } = req.body;
 
-    // Convertir a minúsculas antes de guardar
     titulo = titulo.toLowerCase();
     descripcion = descripcion.toLowerCase();
 
@@ -53,34 +77,6 @@ export const crearEvento = async (req, res) => {
   } catch (error) {
     console.error(error);
     req.session.error = "Error creando evento";
-    res.redirect("/eventos");
-  }
-};
-
-export const eliminarEvento = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const evento = await Evento.findOne({
-      where: { id, usuarioId: req.session.usuario.id },
-    });
-
-    if (!evento) {
-      req.session.error = "Evento no encontrado o no autorizado";
-      return res.redirect("/eventos");
-    }
-
-    if (evento.public_id_imagen) {
-      await cloudinary.uploader.destroy(evento.public_id_imagen);
-    }
-
-    await evento.destroy();
-
-    req.session.success = "Evento eliminado";
-    res.redirect("/eventos");
-  } catch (error) {
-    console.error(error);
-    req.session.error = "Error al eliminar evento";
     res.redirect("/eventos");
   }
 };

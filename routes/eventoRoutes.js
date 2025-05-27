@@ -3,7 +3,6 @@ import upload from "../middlewares/upload.js";
 import {
   mostrarEventos,
   crearEvento,
-  eliminarEvento,
 } from "../controllers/eventoController.js";
 import methodOverride from "method-override";
 import { toLowerCaseMiddleware } from "../middlewares/toLowerCaseMiddleware.js";
@@ -19,6 +18,5 @@ router.post(
   toLowerCaseMiddleware,
   crearEvento
 );
-router.delete("/eventos/:id", eliminarEvento);
 
 export default router;

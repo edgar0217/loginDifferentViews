@@ -6,6 +6,7 @@ import {
   actualizarUsuario,
   mostrarEditarUsuario,
   crearUsuario,
+  descargarReportePDF,
 } from "../controllers/superAdminController.js";
 import { isSuperAdmin } from "../middlewares/auth.js";
 import { toLowerCaseMiddleware } from "../middlewares/toLowerCaseMiddleware.js";
@@ -32,5 +33,6 @@ router.post(
   toLowerCaseMiddleware,
   crearUsuario
 );
+router.get("/superadmin/descargar-reporte", descargarReportePDF);
 
 export default router;

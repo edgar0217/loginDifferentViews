@@ -63,10 +63,9 @@ function noCacheMiddleware(req, res, next) {
 app.use("/eventos", noCacheMiddleware);
 app.use("/admin", noCacheMiddleware);
 
-// Pasar usuario a vistas
+// Middleware para pasar usuario a vistas
 app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null;
-  console.log("Usuario en sesión:", res.locals.usuario); // Verificar sesión
   next();
 });
 
@@ -77,10 +76,12 @@ app.use(isAuthenticated, adminRoutes); // Rutas de admin protegidas
 app.use(superadminRoutes);
 
 const PORT = process.env.PORT || 3000;
+
 (async () => {
   try {
     await db.authenticate();
     await db.sync({ alter: true });
+
     app.listen(PORT, () => {
       console.log(`Servidor escuchando en http://localhost:${PORT}/login`);
     });

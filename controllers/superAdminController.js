@@ -2,13 +2,28 @@ import Usuario from "../models/userModel.js";
 import Evento from "../models/eventoModel.js";
 import { cloudinary } from "../config/cloudinary.js";
 import bcrypt from "bcrypt";
+import { generateReportePDF } from "../utils/pdfGenerator.js";
 
 const saltRounds = 10;
 
 export const vistaSuperAdmin = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll();
-    const eventos = await Evento.findAll({ include: Usuario });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 20;
+    const offset = (page - 1) * limit;
+
+    const { count: eventosCount, rows: eventos } = await Evento.findAndCountAll(
+      {
+        include: Usuario,
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
+      }
+    );
+
+    const totalPages = Math.ceil(eventosCount / limit);
 
     const success = req.session.success || null;
     const error = req.session.error || null;
@@ -18,6 +33,9 @@ export const vistaSuperAdmin = async (req, res) => {
     res.render("superadmin", {
       usuarios,
       eventos,
+      eventosCount,
+      totalPages,
+      currentPage: page,
       usuarioEditar: null,
       success,
       error,
@@ -153,7 +171,6 @@ export const crearUsuario = async (req, res) => {
       rol,
     } = req.body;
 
-    // Validar campos obligatorios
     if (
       !nombre ||
       !apellidos ||
@@ -167,19 +184,16 @@ export const crearUsuario = async (req, res) => {
       return res.redirect("/superadmin");
     }
 
-    // Evitar creación de superadmin desde el formulario
     if (rol === "superadmin") {
       req.session.error = "No puedes crear un usuario con rol Superadmin.";
       return res.redirect("/superadmin");
     }
 
-    // Validar contraseñas
     if (password !== passwordConfirm) {
       req.session.error = "Las contraseñas no coinciden.";
       return res.redirect("/superadmin");
     }
 
-    // Verificar si ya existe la matrícula
     const existe = await Usuario.findOne({
       where: { matricula: matricula.toLowerCase() },
     });
@@ -188,10 +202,8 @@ export const crearUsuario = async (req, res) => {
       return res.redirect("/superadmin");
     }
 
-    // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Crear usuario
     await Usuario.create({
       nombre: nombre.toLowerCase(),
       apellidos: apellidos.toLowerCase(),
@@ -210,5 +222,34 @@ export const crearUsuario = async (req, res) => {
     console.error(error);
     req.session.error = "Error al crear usuario.";
     res.redirect("/superadmin");
+  }
+};
+
+export const descargarReportePDF = async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll({
+      where: { rol: "alumno" },
+      attributes: [
+        "id",
+        "nombre",
+        "apellidos",
+        "matricula",
+        "telefono",
+        "correo_institucional",
+        "createdAt",
+      ],
+    });
+
+    const eventos = await Evento.findAll({ include: Usuario });
+
+    await generateReportePDF(res, usuarios, eventos, {
+      titulo: "Reporte de Usuarios y Eventos",
+      tituloColor: "#4F46E5",
+      encabezadoColor: "#2563EB",
+      filename: "reporte_superadmin.pdf",
+    });
+  } catch (error) {
+    console.error("Error generando reporte PDF:", error);
+    res.status(500).send("Error generando el reporte PDF");
   }
 };

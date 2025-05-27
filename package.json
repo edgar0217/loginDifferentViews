@@ -13,6 +13,8 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "canvas": "^3.1.0",
+    "chart.js": "^4.4.9",
     "cloudinary": "^1.41.3",
     "connect-session-sequelize": "^7.1.7",
     "dotenv": "^16.5.0",
@@ -22,6 +24,7 @@
     "method-override": "^3.0.0",
     "multer": "^2.0.0",
     "multer-storage-cloudinary": "^4.0.0",
+    "pdfkit": "^0.17.1",
     "pg": "^8.16.0",
     "sequelize": "^6.37.7"
   },

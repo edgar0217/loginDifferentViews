@@ -45,7 +45,8 @@ export const listaEventosAdmin = async (req, res) => {
 
     const contadorVisitas = 0;
 
-    res.render("admineventos", {
+    res.render("adminEventos", {
+      // Aquí corregido el nombre con mayúscula E
       eventos,
       alumnos,
       eventosCount,
@@ -144,8 +145,7 @@ export const descargarReportePozaRica = async (req, res) => {
       include: Usuario,
       where: {
         descripcion: {
-          [Op.iLike]: "%poza rica%", // Para bases que soporten iLike (Postgres)
-          // Para MySQL usa Op.like y maneja mayúsc/minúsc aparte si quieres
+          [Op.iLike]: "%poza rica%",
         },
       },
     });

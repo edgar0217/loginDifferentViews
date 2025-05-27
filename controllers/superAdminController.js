@@ -31,7 +31,7 @@ export const vistaSuperAdmin = async (req, res) => {
     req.session.success = null;
     req.session.error = null;
 
-    res.render("superadmin", {
+    res.render("superAdmin", {
       usuarios,
       eventos,
       eventosCount,
@@ -109,7 +109,7 @@ export const mostrarEditarUsuario = async (req, res) => {
     );
     const totalPages = Math.ceil(eventosCount / limit);
 
-    res.render("superadmin", {
+    res.render("superAdmin", {
       usuarios,
       eventos,
       eventosCount,

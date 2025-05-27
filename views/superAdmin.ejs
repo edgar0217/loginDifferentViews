@@ -30,7 +30,7 @@
           </button>
         </form>
         <form
-          action="/superadmin/descargar-reporte"
+          action="/superAdmin/descargar-reporte"
           method="GET"
           target="_blank"
         >
@@ -43,7 +43,7 @@
           </button>
         </form>
         <form
-          action="/superadmin/descargar-reporte-poza-rica"
+          action="/superAdmin/descargar-reporte-poza-rica"
           method="GET"
           target="_blank"
           class="ml-2"
@@ -58,7 +58,7 @@
         </form>
 
         <form
-          action="/superadmin/descargar-reporte-coatzintla"
+          action="/superAdmin/descargar-reporte-coatzintla"
           method="GET"
           target="_blank"
           class="ml-2"
@@ -92,7 +92,7 @@
               class="flex justify-between items-center py-3 hover:bg-gray-700 rounded-md px-2 transition"
             >
               <a
-                href="/superadmin/editar-usuario/<%= usuario.id %>"
+                href="/superAdmin/editar-usuario/<%= usuario.id %>"
                 class="text-indigo-300 hover:text-indigo-400 font-medium truncate max-w-[75%]"
               >
                 <%= usuario.nombre %>
@@ -100,7 +100,7 @@
 
               <% if (usuario.rol !== 'superadmin') { %>
               <form
-                action="/superadmin/eliminar-usuario/<%= usuario.id %>"
+                action="/superAdmin/eliminar-usuario/<%= usuario.id %>"
                 method="POST"
                 class="inline eliminar-usuario-form"
               >
@@ -125,7 +125,7 @@
               Crear Nuevo Usuario
             </h2>
             <form
-              action="/superadmin/crear-usuario"
+              action="/superAdmin/crear-usuario"
               method="POST"
               class="space-y-5 max-w-full"
             >
@@ -491,7 +491,7 @@
                 Editar
               </button>
               <form
-                action="/superadmin/eliminar-evento/<%= evento.id %>"
+                action="/superAdmin/eliminar-evento/<%= evento.id %>"
                 method="POST"
                 class="inline eliminar-evento-form"
               >
@@ -644,7 +644,7 @@
             document.getElementById("usuarioId-editar").value = usuarioId;
 
             // Actualizar action del formulario
-            formEditar.action = `/superadmin/editar-evento/${eventoId}`;
+            formEditar.action = `/superAdmin/editar-evento/${eventoId}`;
 
             // Mostrar formulario
             seccionEditar.classList.remove("hidden");

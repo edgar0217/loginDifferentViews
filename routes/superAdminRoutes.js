@@ -16,43 +16,43 @@ import { toLowerCaseMiddleware } from "../middlewares/toLowerCaseMiddleware.js";
 
 const router = express.Router();
 
-router.get("/superadmin", isSuperAdmin, vistaSuperAdmin);
+router.get("/superAdmin", isSuperAdmin, vistaSuperAdmin);
 
-router.post("/superadmin/eliminar-usuario/:id", isSuperAdmin, eliminarUsuario);
-router.post("/superadmin/eliminar-evento/:id", isSuperAdmin, eliminarEvento);
+router.post("/superAdmin/eliminar-usuario/:id", isSuperAdmin, eliminarUsuario);
+router.post("/superAdmin/eliminar-evento/:id", isSuperAdmin, eliminarEvento);
 
 router.get(
-  "/superadmin/editar-usuario/:id",
+  "/superAdmin/editar-usuario/:id",
   isSuperAdmin,
   mostrarEditarUsuario
 );
 router.post(
-  "/superadmin/editar-usuario/:id",
+  "/superAdmin/editar-usuario/:id",
   isSuperAdmin,
   toLowerCaseMiddleware,
   actualizarUsuario
 );
 
 router.post(
-  "/superadmin/crear-usuario",
+  "/superAdmin/crear-usuario",
   isSuperAdmin,
   toLowerCaseMiddleware,
   crearUsuario
 );
 
-router.get("/superadmin/descargar-reporte", isSuperAdmin, descargarReportePDF);
+router.get("/superAdmin/descargar-reporte", isSuperAdmin, descargarReportePDF);
 router.get(
-  "/superadmin/descargar-reporte-poza-rica",
+  "/superAdmin/descargar-reporte-poza-rica",
   isSuperAdmin,
   descargarReportePozaRica
 );
 router.get(
-  "/superadmin/descargar-reporte-coatzintla",
+  "/superAdmin/descargar-reporte-coatzintla",
   isSuperAdmin,
   descargarReporteCoatzintla
 );
 
 // NUEVO: Ruta para actualizar evento
-router.post("/superadmin/editar-evento/:id", isSuperAdmin, actualizarEvento);
+router.post("/superAdmin/editar-evento/:id", isSuperAdmin, actualizarEvento);
 
 export default router;

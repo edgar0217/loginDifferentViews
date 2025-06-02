@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Panel Superadmin - Tema Oscuro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/output.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body class="bg-gray-900 text-gray-200 p-6 min-h-screen font-sans antialiased">
@@ -192,92 +192,66 @@
       </main>
 
       <!-- Eventos -->
-      <section id="eventos" class="max-w-7xl mx-auto mt-10 bg-gray-800 rounded-lg border border-gray-700 p-6 max-h-[calc(100vh-150px)] overflow-y-auto">
-        <h2 class="text-xl font-semibold mb-6 text-indigo-300 tracking-wide">Eventos</h2>
-        <ul class="divide-y divide-gray-700 max-h-[calc(100vh-400px)] overflow-y-auto">
-          <% eventos.forEach((evento) => { %>
-            <li class="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 hover:bg-gray-700 rounded-md px-3 transition"
-                data-evento-id="<%= evento.id %>"
-                data-evento-titulo="<%= evento.titulo %>"
-                data-evento-descripcion="<%= evento.descripcion.replace(/"/g, '&quot;') %>"
-                data-evento-usuarioid="<%= evento.usuarioId %>">
-              <div class="flex-1 min-w-0">
-                <strong class="block text-lg truncate text-indigo-200"><%= evento.titulo %></strong>
-                <span class="text-gray-400 text-sm">
-                  Creado por: <%= evento.usuario.nombre %> (<%= evento.usuario.usuario %>)
-                </span>
-                <br />
-                <span class="text-gray-400 text-sm">
-                  Fecha creación: <%= new Date(evento.createdAt).toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) %>
-                </span>
-              </div>
-              <% if (evento.url_imagen) { %>
-                <img src="<%= evento.url_imagen %>" alt="Imagen del evento" class="w-32 h-20 object-cover rounded-md" />
-              <% } %>
-              <div class="flex gap-2">
-                <button class="editar-evento-btn text-indigo-400 hover:text-indigo-600 text-sm font-semibold px-3 py-1 rounded transition" title="Editar evento" type="button">
-                  Editar
-                </button>
-                <form action="/superAdmin/eliminar-evento/<%= evento.id %>" method="POST" class="inline eliminar-evento-form">
-                  <button type="submit" class="text-red-500 hover:text-red-600 text-sm font-semibold px-3 py-1 rounded transition" title="Eliminar evento">
-                    Eliminar
-                  </button>
-                </form>
-              </div>
-            </li>
-          <% }) %>
-        </ul>
-        <!-- Formulario oculto para edición de eventos -->
-        <section id="form-editar-evento-section" class="mt-10 bg-gray-900 rounded-lg border border-gray-700 p-6 hidden max-w-4xl mx-auto">
-          <h3 class="text-xl font-semibold mb-6 text-indigo-300 tracking-wide">Editar Evento</h3>
-          <form id="form-editar-evento" method="POST" action="" class="space-y-5">
-            <div>
-              <label for="titulo-editar" class="block font-semibold mb-1">Título</label>
-              <input type="text" id="titulo-editar" name="titulo" required class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200" />
-            </div>
-            <div>
-              <label for="descripcion-editar" class="block font-semibold mb-1">Descripción</label>
-              <textarea id="descripcion-editar" name="descripcion" rows="4" required class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200"></textarea>
-            </div>
-            <div>
-              <label for="usuarioId-editar" class="block font-semibold mb-1">Asignar Usuario</label>
-              <select id="usuarioId-editar" name="usuarioId" required class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200">
-                <% usuarios.forEach(usuario => { %>
-                  <option value="<%= usuario.id %>"><%= usuario.nombre %> (<%= usuario.usuario %>)</option>
-                <% }) %>
-              </select>
-            </div>
-            <div class="flex gap-4">
-              <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-md">
-                Guardar Cambios
-              </button>
-              <button type="button" id="btnCancelarEdicionEvento" class="bg-red-700 hover:bg-red-800 text-white font-semibold px-6 py-2 rounded-md">
-                Cancelar
-              </button>
-            </div>
+<section id="eventos"
+  class="w-full bg-gray-800 rounded-lg border border-gray-700 p-6
+         max-h-[calc(100vh-120px)] min-h-[350px] overflow-y-auto">
+  <h2 class="text-xl font-semibold mb-6 text-indigo-300 tracking-wide">Eventos</h2>
+  <ul class="space-y-4">
+    <% eventos.forEach((evento) => { %>
+      <li class="py-3 px-4 bg-gray-700 rounded-md shadow hover:shadow-lg transition">
+        <strong class="block text-lg text-indigo-200 mb-1"><%= evento.titulo %></strong>
+        <span class="text-gray-400 text-sm block mb-1">
+          Creado por: <%= evento.usuario.nombre %> (<%= evento.usuario.usuario %>)
+        </span>
+        <span class="text-gray-400 text-sm block mb-2">
+          Fecha creación: <%= new Date(evento.createdAt).toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) %>
+        </span>
+        <% if (evento.url_imagen) { %>
+          <img src="<%= evento.url_imagen %>" alt="Imagen del evento"
+               class="w-full max-w-xs h-32 object-cover rounded-md mb-2" />
+        <% } %>
+        <div class="flex gap-2">
+          <button class="editar-evento-btn text-indigo-400 hover:text-indigo-600 text-sm font-semibold px-3 py-1 rounded transition" 
+            type="button" 
+            title="Editar evento"
+            data-evento-id="<%= evento.id %>"
+            data-evento-titulo="<%= evento.titulo %>"
+            data-evento-descripcion="<%= evento.descripcion.replace(/"/g, '&quot;') %>"
+            data-evento-usuarioid="<%= evento.usuarioId %>"
+          >
+            Editar
+          </button>
+          <form action="/superAdmin/eliminar-evento/<%= evento.id %>" method="POST" class="inline eliminar-evento-form">
+            <button type="submit" class="text-red-500 hover:text-red-600 text-sm font-semibold px-3 py-1 rounded transition" title="Eliminar evento">
+              Eliminar
+            </button>
           </form>
-        </section>
-        <!-- Paginación -->
-        <div class="flex justify-center mt-6 space-x-3 select-none">
-          <% if (currentPage > 1) { %>
-            <a href="?page=<%= currentPage - 1 %>#eventos" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 text-white">Anterior</a>
-          <% } else { %>
-            <span class="px-3 py-1 bg-gray-700 text-gray-500 rounded cursor-not-allowed">Anterior</span>
-          <% } %>
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <% if (i === currentPage) { %>
-              <span class="px-3 py-1 bg-indigo-800 rounded font-semibold text-white"><%= i %></span>
-            <% } else { %>
-              <a href="?page=<%= i %>#eventos" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 text-white"><%= i %></a>
-            <% } %>
-          <% } %>
-          <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>#eventos" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 text-white">Siguiente</a>
-          <% } else { %>
-            <span class="px-3 py-1 bg-gray-700 text-gray-500 rounded cursor-not-allowed">Siguiente</span>
-          <% } %>
         </div>
-      </section>
+      </li>
+    <% }) %>
+  </ul>
+  <!-- Paginación (opcional, puedes quitar si no usas paginación) -->
+  <div class="flex justify-center mt-6 space-x-3 select-none">
+    <% if (currentPage > 1) { %>
+      <a href="?page=<%= currentPage - 1 %>#eventos" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 text-white">Anterior</a>
+    <% } else { %>
+      <span class="px-3 py-1 bg-gray-700 text-gray-500 rounded cursor-not-allowed">Anterior</span>
+    <% } %>
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <% if (i === currentPage) { %>
+        <span class="px-3 py-1 bg-indigo-800 rounded font-semibold text-white"><%= i %></span>
+      <% } else { %>
+        <a href="?page=<%= i %>#eventos" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 text-white"><%= i %></a>
+      <% } %>
+    <% } %>
+    <% if (currentPage < totalPages) { %>
+      <a href="?page=<%= currentPage + 1 %>#eventos" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 text-white">Siguiente</a>
+    <% } else { %>
+      <span class="px-3 py-1 bg-gray-700 text-gray-500 rounded cursor-not-allowed">Siguiente</span>
+    <% } %>
+  </div>
+</section>
+
     </div>
     <script src="/js/superAdmin.js"></script>
     <script>

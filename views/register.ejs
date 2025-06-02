@@ -4,11 +4,23 @@
     <meta charset="UTF-8" />
     <title>Registro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/output.css" />
     <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Boxicons para el icono del ojo -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
   </head>
 
   <body class="min-h-screen pt-20 text-gray-800">
+    <header class="fixed top-0 left-0 w-full z-50 mt-8">
+      <div class="max-w-7xl mx-auto px-4 py-8 flex justify-center">
+        <h1 class="text-white text-4xl sm:text-6xl font-extrabold select-none">
+          SISPREP
+        </h1>
+      </div>
+    </header>
     <section
       class="flex items-center justify-center px-6 md:px-12 lg:px-24 py-16 min-h-screen"
     >
@@ -36,7 +48,7 @@
           <input
             type="text"
             name="usuario"
-            placeholder="Usuario (clave única)"
+            placeholder="CURP"
             required
             class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
           />
@@ -69,13 +81,29 @@
             class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
             oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            required
-            class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-          />
+
+          <!-- Campo Contraseña con botón de mostrar/ocultar -->
+          <div>
+            <div class="relative">
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="Contraseña"
+                required
+                class="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm pr-12"
+              />
+              <button
+                type="button"
+                id="togglePassword"
+                tabindex="-1"
+                class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+                aria-label="Mostrar/ocultar contraseña"
+              >
+                <i class="bx bx-show text-xl" id="iconEye"></i>
+              </button>
+            </div>
+          </div>
 
           <button
             type="submit"
@@ -93,5 +121,19 @@
         </form>
       </div>
     </section>
+
+    <script>
+      // Mostrar/Ocultar contraseña
+      const passwordInput = document.getElementById("password");
+      const togglePassword = document.getElementById("togglePassword");
+      const iconEye = document.getElementById("iconEye");
+      togglePassword.addEventListener("click", function () {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        iconEye.className = isPassword
+          ? "bx bx-hide text-xl"
+          : "bx bx-show text-xl";
+      });
+    </script>
   </body>
 </html>

@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <title>Panel Admin - Eventos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="/css/output.css" />
     <link rel="stylesheet" href="/css/styles.css" />
     <!-- SweetAlert2 -->
@@ -117,9 +122,99 @@
           <% }) %>
         </ul>
       </div>
+      <!-- Imágenes Destacadas -->
+      <!-- Imágenes Destacadas -->
+      <div
+        class="flex flex-col sm:flex-row gap-8 justify-center items-start mb-16 mt-10"
+      >
+        <!-- Imagen 1 -->
+        <div
+          class="flex flex-col items-center bg-gray-800 rounded-xl p-6 w-full sm:w-80 shadow transition min-h-[330px]"
+        >
+          <span class="text-lg font-bold text-teal-300 mb-3">Imagen 1</span>
+          <img
+            id="imagen1"
+            src="/img/placeholder1.png"
+            alt="Imagen 1"
+            class="w-64 h-44 object-cover rounded-lg border-2 border-teal-500 shadow mb-4 bg-white transition-all duration-200"
+          />
+          <% if (usuario && (usuario.rol === 'admin' || usuario.rol ===
+          'superadmin')) { %>
+          <div class="flex gap-4 w-full justify-center">
+            <label
+              class="flex flex-col items-center cursor-pointer w-1/2 group"
+            >
+              <span
+                class="flex flex-col items-center justify-center text-teal-500 group-hover:text-teal-300 transition"
+              >
+                <i class="bx bx-upload text-4xl mb-1"></i>
+                <span class="text-xs font-medium">Subir</span>
+              </span>
+              <input
+                type="file"
+                id="fileImagen1"
+                accept="image/*"
+                class="hidden"
+              />
+            </label>
+            <button
+              type="button"
+              onclick="borrarImagen(1)"
+              class="flex flex-col items-center justify-center text-red-500 hover:text-red-400 transition w-1/2"
+              title="Borrar Imagen"
+            >
+              <i class="bx bx-trash text-4xl mb-1"></i>
+              <span class="text-xs font-medium">Borrar</span>
+            </button>
+          </div>
+          <% } %>
+        </div>
+        <!-- Imagen 2 -->
+        <div
+          class="flex flex-col items-center bg-gray-800 rounded-xl p-6 w-full sm:w-80 shadow transition min-h-[330px]"
+        >
+          <span class="text-lg font-bold text-teal-300 mb-3">Imagen 2</span>
+          <img
+            id="imagen2"
+            src="/img/placeholder2.png"
+            alt="Imagen 2"
+            class="w-64 h-44 object-cover rounded-lg border-2 border-teal-500 shadow mb-4 bg-white transition-all duration-200"
+          />
+          <% if (usuario && (usuario.rol === 'admin' || usuario.rol ===
+          'superadmin')) { %>
+          <div class="flex gap-4 w-full justify-center">
+            <label
+              class="flex flex-col items-center cursor-pointer w-1/2 group"
+            >
+              <span
+                class="flex flex-col items-center justify-center text-teal-500 group-hover:text-teal-300 transition"
+              >
+                <i class="bx bx-upload text-4xl mb-1"></i>
+                <span class="text-xs font-medium">Subir</span>
+              </span>
+              <input
+                type="file"
+                id="fileImagen2"
+                accept="image/*"
+                class="hidden"
+              />
+            </label>
+            <button
+              type="button"
+              onclick="borrarImagen(2)"
+              class="flex flex-col items-center justify-center text-red-500 hover:text-red-400 transition w-1/2"
+              title="Borrar Imagen"
+            >
+              <i class="bx bx-trash text-4xl mb-1"></i>
+              <span class="text-xs font-medium">Borrar</span>
+            </button>
+          </div>
+          <% } %>
+        </div>
+      </div>
 
       <!-- Tabla de eventos con scroll horizontal en móvil -->
-      <div class="overflow-x-auto rounded-lg border border-gray-700">
+      <div class="overflow-x-auto rounded-lg border border-gray-700 mt-3">
         <table class="min-w-full divide-y divide-gray-700 table-auto">
           <thead class="bg-gray-800">
             <tr>
@@ -406,6 +501,97 @@
           timer: 2000,
           showConfirmButton: false,
         });
+      <% } %>
+    </script>
+    <script>
+      async function cargarImagenes() {
+        const res = await fetch('/imagenes-destacadas');
+        const imagenes = await res.json();
+        imagenes.forEach(img => {
+          document.getElementById('imagen' + img.orden).src = img.url;
+        });
+      }
+      cargarImagenes();
+
+      <% if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) { %>
+      document.getElementById('fileImagen1').addEventListener('change', function () {
+        subirImagen(1, this.files[0]);
+      });
+      document.getElementById('fileImagen2').addEventListener('change', function () {
+        subirImagen(2, this.files[0]);
+      });
+
+      function subirImagen(orden, file) {
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('imagen', file);
+        formData.append('orden', orden);
+        fetch('/imagenes-destacadas', {
+          method: 'POST',
+          body: formData
+        })
+          .then(r => r.json())
+          .then(d => {
+            if (d.url) {
+              document.getElementById('imagen' + orden).src = d.url;
+              Swal.fire({
+                icon: 'success',
+                title: 'Imagen actualizada',
+                showConfirmButton: false,
+                timer: 1200
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: d.error || 'Error al subir'
+              });
+            }
+          });
+      }
+
+      function borrarImagen(orden) {
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: 'Esta imagen será borrada y no se podrá recuperar.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Sí, borrar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch('/imagenes-destacadas/' + orden, { method: 'DELETE' })
+              .then(r => r.json())
+              .then(d => {
+                if (d.ok) {
+                  document.getElementById('imagen' + orden).src = '/img/placeholder' + orden + '.png';
+                  Swal.fire({
+                    title: 'Borrado',
+                    text: 'La imagen ha sido borrada correctamente.',
+                    icon: 'success',
+                    timer: 1400,
+                    showConfirmButton: false
+                  });
+                } else {
+                  Swal.fire({
+                    title: 'Error',
+                    text: d.error || 'Error al borrar la imagen.',
+                    icon: 'error'
+                  });
+                }
+              })
+              .catch(() => {
+                Swal.fire({
+                  title: 'Error',
+                  text: 'No se pudo conectar al servidor.',
+                  icon: 'error'
+                });
+              });
+          }
+        });
+      }
       <% } %>
     </script>
   </body>

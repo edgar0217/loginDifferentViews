@@ -55,70 +55,70 @@
             </button>
           </form>
         </div>
-      </header>
+        <button
+  id="btnAbrirModalImagenes"
+  class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-md font-semibold transition self-end"
+>
+  Cambiar Imágenes Destacadas
+</button>
 
-<div class="flex flex-col sm:flex-row gap-8 justify-center items-start mb-16 mt-10">
-  <!-- Imagen 1 -->
-  <div class="flex flex-col items-center bg-gray-800 rounded-xl p-6 w-full sm:w-80 shadow transition min-h-[330px]">
-    <span class="text-lg font-bold text-teal-300 mb-3">Imagen 1</span>
-    <img
-      id="imagen1"
-      src="/img/placeholder1.png"
-      alt="Imagen 1"
-      class="w-64 h-44 object-cover rounded-lg border-2 border-teal-500 shadow mb-4 bg-white transition-all duration-200"
-      style="aspect-ratio: 16/11"
-    />
-    <% if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) { %>
-    <div class="flex gap-4 w-full justify-center">
-      <label class="flex flex-col items-center cursor-pointer w-1/2 group">
-        <span class="flex flex-col items-center justify-center text-teal-500 group-hover:text-teal-300 transition">
-          <i class="bx bx-upload text-4xl mb-1"></i>
-          <span class="text-xs font-medium">Subir</span>
-        </span>
-        <input type="file" id="fileImagen1" accept="image/*" class="hidden"/>
-      </label>
-      <button
-        type="button"
-        onclick="borrarImagen(1)"
-        class="flex flex-col items-center justify-center text-red-500 hover:text-red-400 transition w-1/2"
-        title="Borrar Imagen"
-      >
-        <i class="bx bx-trash text-4xl mb-1"></i>
-        <span class="text-xs font-medium">Borrar</span>
-      </button>
+      </header>
+      <!-- Modal Imágenes Destacadas -->
+<div
+  id="modalImagenes"
+  class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden"
+>
+  <div class="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto relative">
+    <button
+      id="cerrarModalImagenes"
+      class="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl font-bold"
+      title="Cerrar"
+    >
+      &times;
+    </button>
+    <h2 class="text-2xl font-bold text-teal-400 text-center mb-6">Cambiar Imágenes Destacadas</h2>
+    <div class="flex flex-col sm:flex-row gap-8 justify-center items-start">
+      <!-- Imagen 1 -->
+      <div class="flex flex-col items-center bg-gray-700 rounded-xl p-6 w-full sm:w-80 shadow min-h-[330px]">
+        <span class="text-lg font-bold text-teal-300 mb-3">Imagen 1</span>
+        <img id="imagen1" src="/img/placeholder1.png" alt="Imagen 1" class="w-64 h-44 object-cover rounded-lg border-2 border-teal-500 shadow mb-4 bg-white" />
+        <% if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) { %>
+        <div class="flex gap-4 w-full justify-center">
+          <label class="flex flex-col items-center cursor-pointer w-1/2 group">
+            <span class="text-teal-500 group-hover:text-teal-300 transition">
+              <i class="bx bx-upload text-4xl mb-1"></i>
+              <span class="text-xs font-medium">Subir</span>
+            </span>
+            <input type="file" id="fileImagen1" accept="image/*" class="hidden" />
+          </label>
+          <button type="button" onclick="borrarImagen(1)" class="flex flex-col items-center justify-center text-red-500 hover:text-red-400 transition w-1/2">
+            <i class="bx bx-trash text-4xl mb-1"></i>
+            <span class="text-xs font-medium">Borrar</span>
+          </button>
+        </div>
+        <% } %>
+      </div>
+      <!-- Imagen 2 -->
+      <div class="flex flex-col items-center bg-gray-700 rounded-xl p-6 w-full sm:w-80 shadow min-h-[330px]">
+        <span class="text-lg font-bold text-teal-300 mb-3">Imagen 2</span>
+        <img id="imagen2" src="/img/placeholder2.png" alt="Imagen 2" class="w-64 h-44 object-cover rounded-lg border-2 border-teal-500 shadow mb-4 bg-white" />
+        <% if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) { %>
+        <div class="flex gap-4 w-full justify-center">
+          <label class="flex flex-col items-center cursor-pointer w-1/2 group">
+            <span class="text-teal-500 group-hover:text-teal-300 transition">
+              <i class="bx bx-upload text-4xl mb-1"></i>
+              <span class="text-xs font-medium">Subir</span>
+            </span>
+            <input type="file" id="fileImagen2" accept="image/*" class="hidden" />
+          </label>
+          <button type="button" onclick="borrarImagen(2)" class="flex flex-col items-center justify-center text-red-500 hover:text-red-400 transition w-1/2">
+            <i class="bx bx-trash text-4xl mb-1"></i>
+            <span class="text-xs font-medium">Borrar</span>
+          </button>
+        </div>
+        <% } %>
+      </div>
     </div>
-    <% } %>
-  </div>
-  <!-- Imagen 2 -->
-  <div class="flex flex-col items-center bg-gray-800 rounded-xl p-6 w-full sm:w-80 shadow transition min-h-[330px]">
-    <span class="text-lg font-bold text-teal-300 mb-3">Imagen 2</span>
-    <img
-      id="imagen2"
-      src="/img/placeholder2.png"
-      alt="Imagen 2"
-      class="w-64 h-44 object-cover rounded-lg border-2 border-teal-500 shadow mb-4 bg-white transition-all duration-200"
-      style="aspect-ratio: 16/11"
-    />
-    <% if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) { %>
-    <div class="flex gap-4 w-full justify-center">
-      <label class="flex flex-col items-center cursor-pointer w-1/2 group">
-        <span class="flex flex-col items-center justify-center text-teal-500 group-hover:text-teal-300 transition">
-          <i class="bx bx-upload text-4xl mb-1"></i>
-          <span class="text-xs font-medium">Subir</span>
-        </span>
-        <input type="file" id="fileImagen2" accept="image/*" class="hidden"/>
-      </label>
-      <button
-        type="button"
-        onclick="borrarImagen(2)"
-        class="flex flex-col items-center justify-center text-red-500 hover:text-red-400 transition w-1/2"
-        title="Borrar Imagen"
-      >
-        <i class="bx bx-trash text-4xl mb-1"></i>
-        <span class="text-xs font-medium">Borrar</span>
-      </button>
-    </div>
-    <% } %>
   </div>
 </div>
 
@@ -433,6 +433,37 @@
       }
       <% } %>
     </script>
+<script>
+  const modalImagenes = document.getElementById('modalImagenes');
+  const abrirModalBtn = document.getElementById('btnAbrirModalImagenes');
+  const cerrarModalBtn = document.getElementById('cerrarModalImagenes');
+
+  // Abrir el modal
+  abrirModalBtn.addEventListener('click', () => {
+    modalImagenes.classList.remove('hidden');
+  });
+
+  // Cerrar al hacer clic en la X
+  cerrarModalBtn.addEventListener('click', () => {
+    modalImagenes.classList.add('hidden');
+  });
+
+  // Cerrar al hacer clic fuera del contenido
+  modalImagenes.addEventListener('click', (e) => {
+    if (e.target === modalImagenes) {
+      modalImagenes.classList.add('hidden');
+    }
+  });
+
+  // Cerrar con tecla Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modalImagenes.classList.contains('hidden')) {
+      modalImagenes.classList.add('hidden');
+    }
+  });
+</script>
+
+
     <script src="/js/superAdmin.js"></script>
   </body>
 </html>

@@ -15,7 +15,7 @@
       window.location.href = "/login";
     </script>
     <% } %>
-
+    <!-- este es el bueno -->
     <main
       class="max-w-3xl mx-auto bg-gray-900 rounded-xl shadow-lg p-6 text-gray-300"
     >
@@ -42,72 +42,83 @@
       >
         Crear Nuevo Reporte
       </h1>
-
-      <div class="flex justify-center items-center gap-8 mb-8">
+      <!-- Imágenes destacadas -->
+      <div class="flex justify-center items-start gap-4 mb-8">
         <!-- Imagen 1 (izquierda) -->
         <div class="flex flex-col items-center">
-          <img
-            id="imagen1"
-            src="/img/placeholder1.png"
-            alt="Imagen 1"
-            class="w-48 h-32 object-contain rounded border mb-2 bg-white"
-          />
+          <div
+            class="w-[200px] h-[150px] overflow-hidden rounded border bg-white shadow mb-2"
+          >
+            <img
+              id="imagen1"
+              src="/img/placeholder1.png"
+              alt="Imagen 1"
+              class="w-full h-full object-cover"
+            />
+          </div>
           <% if (usuario && (usuario.rol === 'admin' || usuario.rol ===
           'superadmin')) { %>
           <input
             type="file"
             id="fileImagen1"
             accept="image/*"
-            class="mb-2"
-            style="display: none"
+            class="mb-2 hidden"
           />
-          <button
-            type="button"
-            class="bg-teal-600 hover:bg-teal-800 text-white px-3 py-1 rounded"
-            onclick="document.getElementById('fileImagen1').click()"
-          >
-            Cambiar Imagen 1
-          </button>
-          <button
-            type="button"
-            class="bg-red-600 hover:bg-red-800 text-white px-3 py-1 rounded ml-2"
-            onclick="borrarImagen(1)"
-          >
-            Borrar Imagen
-          </button>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="bg-teal-600 hover:bg-teal-800 text-white px-3 py-1 rounded"
+              onclick="document.getElementById('fileImagen1').click()"
+            >
+              Cambiar Imagen 1
+            </button>
+            <button
+              type="button"
+              class="bg-red-600 hover:bg-red-800 text-white px-3 py-1 rounded"
+              onclick="borrarImagen(1)"
+            >
+              Borrar
+            </button>
+          </div>
           <% } %>
         </div>
+
         <!-- Imagen 2 (derecha) -->
         <div class="flex flex-col items-center">
-          <img
-            id="imagen2"
-            src="/img/placeholder2.png"
-            alt="Imagen 2"
-            class="w-48 h-32 object-contain rounded border mb-2 bg-white"
-          />
+          <div
+            class="w-[200px] h-[150px] overflow-hidden rounded border bg-white shadow mb-2"
+          >
+            <img
+              id="imagen2"
+              src="/img/placeholder2.png"
+              alt="Imagen 2"
+              class="w-full h-full object-cover"
+            />
+          </div>
           <% if (usuario && (usuario.rol === 'admin' || usuario.rol ===
           'superadmin')) { %>
           <input
             type="file"
             id="fileImagen2"
             accept="image/*"
-            class="mb-2"
-            style="display: none"
+            class="mb-2 hidden"
           />
-          <button
-            type="button"
-            class="bg-teal-600 hover:bg-teal-800 text-white px-3 py-1 rounded"
-            onclick="document.getElementById('fileImagen2').click()"
-          >
-            Cambiar Imagen 2
-          </button>
-          <button
-            type="button"
-            class="bg-red-600 hover:bg-red-800 text-white px-3 py-1 rounded ml-2"
-            onclick="borrarImagen(2)"
-          >
-            Borrar Imagen
-          </button>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="bg-teal-600 hover:bg-teal-800 text-white px-3 py-1 rounded"
+              onclick="document.getElementById('fileImagen2').click()"
+            >
+              Cambiar Imagen 2
+            </button>
+            <button
+              type="button"
+              class="bg-red-600 hover:bg-red-800 text-white px-3 py-1 rounded"
+              onclick="borrarImagen(2)"
+            >
+              Borrar
+            </button>
+          </div>
           <% } %>
         </div>
       </div>
